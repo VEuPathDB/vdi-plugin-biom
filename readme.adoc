@@ -1,0 +1,77 @@
+= VDI Handler Plugin Template
+:icons: font
+
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+This repository is a template repo for creating new VDI handler plugins.
+
+For more details about the scripts themselves and their inputs and outputs see
+the https://github.com/VEuPathDB/vdi-plugin-handler-server[VDI Plugin Handler Server]
+readme.
+
+== Usage
+
+=== Demonstration
+
+==== Prerequisites
+
+* Docker
+* sshuttle
+
+==== Setup
+
+. Copy the link:example.env[] file from the root of this repo to a new file
+  named `.env` in the repository root directory. +
+  The `.env` file will be ignored by Git by default.
+. Edit the new `.env` file by doing the following at minimum:
+.. Provide a valid `LDAP_SERVER` variable value.
+.. Provide a valid `ORACLE_BASE_DN` variable value.
+.. Provide the database TNS name and user credentials for at least one of the
+   database configuration blocks provided.
+.. Comment out any unused database configuration blocks.
++
+[NOTE]
+--
+No connection to any databases will be attempted by the VDI Plugin Handler
+Server or any of the included example plugin scripts.  The database connection
+details are simply required to pass server startup config validation.
+
+The TNS name is the only value that is required to be correct, the credential
+variables may be junk strings.
+--
+
+==== Run the Example
+
+--
+. Build the target example docker container by using one of the included `make`
+build commands.
+. Start up sshuttle (see the VEuPathDB confluence documentation for running a
+service locally).
+. Run the target example docker container by running one of the included `make`
+run commands.
+--
+
+Example::
++
+NOTE: This example assumes `sshuttle` is already running.
++
+[source, shell-session]
+----
+$ make build
+$ make run
+----
+
+=== Creating a New Plugin Handler
+
+To use this repository, click the green "Use this template" button near the top
+right of the repository source file listing table and create a new repository
+for your handler.
+
+This repository follows the normal steps as outlined in the VEuPathDB Confluence
+doc titled "Deploy Containerized Services for Local Development".
