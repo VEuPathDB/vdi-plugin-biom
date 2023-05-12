@@ -3,14 +3,20 @@
 # exit when any command fails
 set -e
 
-biomMetadataFile=$1;
-biomTsvFile=$2
-userDatasetId=$3
-metadataFile=$4
+userDatasetId=$1
+inputDir=$2;
+
+if [ -z $inputDir ] || [ -z $userDatasetId ]; then
+    echo "Usage: install-data user_dataset_id inputDir"
+    exit 255
+fi
 
 export NLS_LANG='AMERICAN_AMERICA.UTF8';
 
-biomFilesToTsv.pl $biomTsvFile $biomMetadataFile
+tsvFile="${inputDir}/data.tsv";
+metaFile="${inputDir}/metadata.json";  # biom metadata
+
+biomFilesToTsv.pl $tsvFile $metaFile
 
 # basename of last directory modified
 study="$(basename $(\ls -1dt ./*/ | head -n 1))"
