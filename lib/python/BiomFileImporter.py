@@ -1,98 +1,57 @@
-#!/usr/bin/python
-
-from handler_base.dataset_handler import DatasetHandler, ValidationException
 import biom
 import os
 from biom.cli.table_validator import _validate_table
 from biom.parse import load_table
-import urllib2
+#import urllib2
+from pathlib import Path
+import sys
 
+class BiomImport():
 
-class BiomExport(DatasetHandler):
-    """
-    Biom Format Exporter
-
-    Args:
-        args (list of str): CLI Input arguments
-            Input Arguments:
-                Base Arguments:
-                    1: Dataset Name
-                    2: Dataset Summary
-                    3: Dataset Description
-                    4: User ID
-                    5: Output File
-                    6: Dataset Origin
-                Biom Specific Arguments:
-                    7: Dataset file path
-
-    Attributes:
-        BIOM_TYPE (str): Constant dataset type value
-        BIOM_VERSION (str): Constant dataset type version value
-    """
-
-    BIOM_TYPE = "BIOM"
-    BIOM_VERSION = "1.0, 2.0, or 2.1"
-
-    def __init__(self, args):
-        DatasetHandler.__init__(
-            self,
-            BiomExport.BIOM_TYPE,
-            BiomExport.BIOM_VERSION,
-            None,
-            args)
-
-        # generic 7 arguments, then dataset file path and dataset origin
-        if len(args) < 7:
-            raise ValueError("The tool was passed an insufficient numbers of arguments:", args)
-
-        self._dataset_file_path = args[6]
-
-    def validate_datasets(self):
+    def importBiom(self, inputDir, outputDir):
         """
-        try read a file
+        inputDir must contain exactly one file, in biom format (BIOM 1.0 or BIOM 2.0+)
 
         the biom validator is too strict - gives errors like "Invalid format 'Biological Observation Matrix 0.9.1-dev', must be '1.0.0'"
         """
 
-        content_path = self._dataset_file_path
+        inputDirPath = Path(inputDir)
+        files = inputDirPath.iterdir()
+        if len(files) != 1:
+            validationError("Must provided exactly one input file")
+
+        content_path = files[0]
 
         if not os.path.exists(content_path):
-            raise ValueError("Does not exist: " . content_path)
+            systemError("File does not exist: " . content_path)
         try:
             table = load_table(content_path)
-        except TypeError, e:
-            raise ValidationException(e)
-        except ValueError, e:
-            raise ValidationException(e)
-        except Exception, e:
-            raise ValidationException(
+        except TypeError as e:
+            validationError(e)
+        except ValueError as e:
+            validationError(e)
+        except Exception as e:
+            validationError(
                 "Could not load the file as BIOM - does it conform to the specification on https://biom-format.org?")
 
         give_table_extra_methods(table)
         generated_by = "MicrobiomeDb exporter"
 
-        with open(self._dataset_file_path+".metadata.json", 'w') as f1:
+        with open(outputDir + "/metadata.json", 'w') as f1:
             table.to_json_but_only_metadata(generated_by, direct_io=f1)
 
-        with open(self._dataset_file_path+".data.tsv", 'w') as f2:
+        with open(outputDir + "/data.tsv", 'w') as f2:
             table.to_json_but_only_data_and_not_json_but_tsv(generated_by, direct_io=f2)
 
-    def identify_dependencies(self):
-        return []
+# throw exit code 1 to provide user with validation error message (stdout)
+def validationError(msg):
+    print(msg, file=sys.stdout)
+    sys.exit(1)
 
-    def identify_projects(self):
-        return ["MicrobiomeDB"]
-
-    def identify_supported_projects(self):
-        return ["MicrobiomeDB"]
-
-    def identify_dataset_files(self):
-        return [
-          {"name": "uploaded.biom", "path": self._dataset_file_path},
-          {"name": "metadata.json", "path": self._dataset_file_path+".metadata.json"},
-          {"name": "data.tsv", "path": self._dataset_file_path + ".data.tsv"}
-        ]
-
+# throw exit code > 1 to indicat a systm error (stderr)
+def systemError(msg):
+    print(msg, file=sys.stderr)
+    sys.exit(2)
 
 def give_table_extra_methods(table):
     # just my looking at the name you know this is gonna be good isn't it
