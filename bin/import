@@ -2,7 +2,7 @@
 
 import sys
 sys.path.insert(0, "/opt/veupathdb/lib/python")
-import BiomFileImporter
+from BiomFileImporter import BiomImporter
 
 def usage():
     msg = """
@@ -23,7 +23,8 @@ exit 2 if there is a system err
 def main():
     if len(sys.argv) != 3:
         usage()
-    BiomImporter.importBiom(sys.argv[1], sys.argv[2])
+    importer = BiomImporter()
+    importer.importBiom(sys.argv[1], sys.argv[2])
 
 if __name__ == "__main__":
     sys.exit(main())

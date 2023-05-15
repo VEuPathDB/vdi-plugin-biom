@@ -5,6 +5,7 @@ RUN apk add --no-cache bash; \
 
 COPY bin/ /opt/veupathdb/bin
 COPY lib/ /opt/veupathdb/lib
+COPY testdata/ /opt/veupathdb/testdata
 
 RUN chmod +x /opt/veupathdb/bin/*
 
@@ -20,6 +21,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip
 
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir biom-format
+    pip3 install --no-cache-dir biom-format && \
+    pip3 install --no-cache-dir future
 
 ENV PYTHONPATH "${PYTHONPATH}:/opt/veupathdb/lib/python"

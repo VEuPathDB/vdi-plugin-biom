@@ -2,11 +2,10 @@ import biom
 import os
 from biom.cli.table_validator import _validate_table
 from biom.parse import load_table
-#import urllib2
 from pathlib import Path
 import sys
 
-class BiomImport():
+class BiomImporter():
 
     def importBiom(self, inputDir, outputDir):
         """
@@ -16,7 +15,7 @@ class BiomImport():
         """
 
         inputDirPath = Path(inputDir)
-        files = inputDirPath.iterdir()
+        files = list(inputDirPath.iterdir())
         if len(files) != 1:
             validationError("Must provided exactly one input file")
 
