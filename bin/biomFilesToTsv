@@ -32,13 +32,11 @@ my $relAbundanceDesc = "Relative taxonomic abundance analysis";
 
 my $data = $ARGV[0];
 my $metaDataJson = $ARGV[1];
+my $vdiDatasetId;
 
-my $timestamp = strftime("%Y%m%d%H%M%S", localtime);
-
-my $dir = tempdir("auto_${timestamp}_XXXX", CLEANUP => 0);
-
+my $dir = $vdiDatasetId;
+mkdir $dir;
 mkdir "$dir/results";
-
 
 my $sourceFile = "source.tsv";
 my $ontologyTermsFile = "ontology_terms.txt";

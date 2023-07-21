@@ -3,17 +3,22 @@
 # exit when any command fails
 set -e
 
-biomMetadataFile=$1;
-biomTsvFile=$2
-userDatasetId=$3
-metadataFile=$4
+userDatasetId=$1
+inputDir=$2;
+
+if [ -z $inputDir ] || [ -z $userDatasetId ]; then
+    echo "Usage: install-data user_dataset_id inputDir"
+    exit 255
+fi
 
 export NLS_LANG='AMERICAN_AMERICA.UTF8';
 
-biomFilesToTsv.pl $biomTsvFile $biomMetadataFile
+tsvFile="${inputDir}/data.tsv";
+metaFile="${inputDir}/metadata.json";  # biom metadata
 
-# basename of last directory modified
-study="$(basename $(\ls -1dt ./*/ | head -n 1))"
+biomFilesToTsv.pl $tsvFile $metaFile $userDatasetId
+
+study=$userDatasetId  # just needs to be a unique name
 externalDatabaseName=MicrobiomeStudyEDA_${study}_RSRC
 
 ga GUS::Supported::Plugin::InsertExternalDatabase --name $externalDatabaseName --commit;
@@ -63,13 +68,8 @@ ga ApiCommonData::Load::Plugin::LoadEntityTypeAndAttributeGraphs \
     --schema ApidbUserDatasets \
     --commit
 
- ga ApiCommonData::Load::Plugin::InsertUserDatasetAttributes \
-     --userDatasetId $userDatasetId \
-     --metadataFile $metadataFile \
-     --commit
-
  # This is temporary solution;  remove when merge with megastudy branch
- updateHasCollections.pl $userDatasetId
+ updateHasCollections $userDatasetId
 
  # clean out tables not used by the application with partial delete
  deleteStudy.pl $userDatasetId 1
