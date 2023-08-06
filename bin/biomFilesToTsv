@@ -9,6 +9,15 @@ use File::Temp qw/tempfile tempdir/;
 
 use POSIX qw/strftime/;
 
+# exit conditions:
+# - success:  exit status 0
+# - validation error: exit status 1.  write user-facing message to stdout
+# - system failure: any other exit status.  write error message to stderr
+
+my $data = $ARGV[0];
+my $metaDataJson = $ARGV[1];
+my $outputDirName = $ARGV[2];  
+
 my $REASONABLE_ID_LENGTH = 100;
 my %MATERIAL_TYPES;
 my %CHAR_QUALIFIERS;
@@ -30,28 +39,23 @@ my $taxonIdSourceID = "MBIOTEMP_TAXON_SOURCE_ID";
 my $relAbundanceSourceId = "EUPATH_0009250";
 my $relAbundanceDesc = "Relative taxonomic abundance analysis";
 
-my $data = $ARGV[0];
-my $metaDataJson = $ARGV[1];
-my $vdiDatasetId;
-
-my $dir = $vdiDatasetId;
-mkdir $dir;
-mkdir "$dir/results";
+mkdir $outputDirName;
+mkdir "$outputDirName/results";
 
 my $sourceFile = "source.tsv";
 my $ontologyTermsFile = "ontology_terms.txt";
 my $ontologyRelationshipsFile = "ontology_relationships.txt";
 my $ontologyMappingFile = "ontologyMapping.xml";
 my $sourceType = "Source";
-my $abundanceFile = "${dir}.${sourceType}.abundance.tsv";
+my $abundanceFile = "${outputDirName}.${sourceType}.abundance.tsv";
 
-&printInvestigationXml($dir, $sourceFile, $sourceType);
+&printInvestigationXml($outputDirName, $sourceFile, $sourceType);
 
 open(FILE, $data) or die "Cannot open file $data for reading: $!";
 
-open(TERMS, ">$dir/$ontologyTermsFile") or die "Cannot open file $dir/$ontologyTermsFile for writing: $!";
-open(RELS, ">$dir/$ontologyRelationshipsFile") or die "Cannot open file $dir/$ontologyRelationshipsFile for writing: $!";
-open(MAP, ">$dir/$ontologyMappingFile") or die "Cannot open file $dir/$ontologyMappingFile for writing: $!";
+open(TERMS, ">$outputDirName/$ontologyTermsFile") or die "Cannot open file $outputDirName/$ontologyTermsFile for writing: $!";
+open(RELS, ">$outputDirName/$ontologyRelationshipsFile") or die "Cannot open file $outputDirName/$ontologyRelationshipsFile for writing: $!";
+open(MAP, ">$outputDirName/$ontologyMappingFile") or die "Cannot open file $outputDirName/$ontologyMappingFile for writing: $!";
 
 print TERMS &makeTermLine($sourceType, undef, 'mt');
 
@@ -94,10 +98,10 @@ foreach(keys %taxaSourceIds) {
 print TERMS &makeTermLine($relAbundanceSourceId, $relAbundanceDesc, 'taxa');
 
 my $sourceOut;
-open($sourceOut, ">$dir/$sourceFile") or die "Cannot open file abundance.tsv for writing:$!";
+open($sourceOut, ">$outputDirName/$sourceFile") or die "Cannot open file abundance.tsv for writing:$!";
 
 my $tsvOut;
-open($tsvOut, ">$dir/results/$abundanceFile") or die "Cannot open file abundance.tsv for writing:$!";
+open($tsvOut, ">$outputDirName/results/$abundanceFile") or die "Cannot open file abundance.tsv for writing:$!";
 
 my @ids = map {$_->{id}} @{$decodedJson->{columns}};
 
@@ -212,7 +216,8 @@ close TERMS;
 
 
 unless($hasTaxonomyCount > 0) {
-    die "Taxonomy Missing.  Only found IDs";
+    print STDOUT "Taxonomy Missing.  Only found IDs\n";
+    exit 1;
 }
 
 print MAP "<ontologymappings>\n";
