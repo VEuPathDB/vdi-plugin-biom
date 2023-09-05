@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-base:1.0.1
+FROM veupathdb/vdi-plugin-base:latest
 
 RUN apt-get update && apt-get install -y \
     python3-pip
@@ -9,7 +9,7 @@ RUN pip3 install --no-cache-dir --upgrade pip && \
 
 COPY bin/ /opt/veupathdb/bin
 COPY lib/ /opt/veupathdb/lib
-# COPY testdata/ /opt/veupathdb/testdata
+#COPY testdata/ /opt/veupathdb/testdata
 
 RUN chmod +x /opt/veupathdb/bin/*
 

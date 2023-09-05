@@ -13,7 +13,6 @@ if [ -z $inputDir ] || [ -z $userDatasetId ]; then
 fi
 
 makeGusConfigFile temp_gus.config
-`cp temp_gus.config /gusApp/gus_home/config/gus.config`; # temporary hack until the --gusconfigfile arg is fixe
 
 export NLS_LANG='AMERICAN_AMERICA.UTF8';
 
