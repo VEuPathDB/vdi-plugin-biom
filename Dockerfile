@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-base:1.0.6
+FROM veupathdb/vdi-plugin-base:1.0.7
 
 RUN apt-get update && apt-get install -y \
     python3-pip
