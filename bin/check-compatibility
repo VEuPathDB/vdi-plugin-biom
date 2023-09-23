@@ -1,1 +1,4 @@
+#!/usr/bin/env bash
 
+# we have no compatibility check to do.
+exit 0;
