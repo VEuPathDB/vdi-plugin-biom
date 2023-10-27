@@ -1,11 +1,8 @@
 FROM veupathdb/vdi-plugin-base:2.0.1
 
-RUN apt-get update && apt-get install -y \
-    python3-pip
-
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir biom-format && \
-    pip3 install --no-cache-dir future
+RUN apt-get update \
+    && apt-get install -y python3-biom-format python3-future \
+    && apt-get clean
 
 COPY bin/ /opt/veupathdb/bin
 COPY lib/ /opt/veupathdb/lib
