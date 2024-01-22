@@ -1,21 +1,25 @@
-FROM veupathdb/vdi-plugin-base:3.0.0
+#FROM veupathdb/vdi-plugin-base:3.0.0
+FROM jbrestel/vdi-plugin-isasimple:latest
 
-RUN apt-get update \
-    && apt-get install -y python3-biom-format python3-future \
-    && apt-get clean
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip &&  \
+    rm -rf /var/lib/apt/lists/*
 
-COPY bin/ /opt/veupathdb/bin
-COPY lib/ /opt/veupathdb/lib
-# COPY testdata/ /opt/veupathdb/testdata
 
-RUN chmod +x /opt/veupathdb/bin/*
+WORKDIR /opt/veupathdb/.local
 
-RUN export LIB_GIT_COMMIT_SHA=4fcd4f3183f8decafe7a0d0a8a8400470c7f9222\
-    && git clone https://github.com/VEuPathDB/lib-vdi-plugin-study.git \
-    && cd lib-vdi-plugin-study \
-    && git checkout $LIB_GIT_COMMIT_SHA \
-    && mkdir -p /opt/veupathdb/lib/perl \
-    && cp lib/perl/VdiStudyHandlerCommon.pm /opt/veupathdb/lib/perl \
-    && cp bin/* /opt/veupathdb/bin
 
-ENV PYTHONPATH "${PYTHONPATH}:/opt/veupathdb/lib/python"
+COPY bin/ /usr/bin
+COPY lib/ /opt/veupathdb/.local/lib
+
+
+ENV PYTHONPATH "${PYTHONPATH}:/opt/veupathdb/.local/lib/python"
+
+#NOTE: Tried venv like "python3 -m venv /opt/veupathdb/.local"
+#    this failed because ensurepip package missing from ubuntu
+#    would be better to make virtual env here and remove "break-system-packages"
+RUN pip3 install --upgrade pip --break-system-packages
+RUN pip3 install numpy --break-system-packages
+RUN pip3 install biom-format  --break-system-packages
+RUN pip3 install h5py  --break-system-packages
+RUN pip3 install future --break-system-packages
