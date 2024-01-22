@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+use strict;
+
+use Getopt::Long;
+
+my ($workDir, $gusConfigFile, $name, $geoMappings, $resultsDir);
+
+GetOptions('workDir=s' => \$workDir,
+           'gusConfigFile=s' => \$gusConfigFile,
+           'name=s' => \$name,
+           'geoMappings=s' => \$geoMappings,
+           'resultsDir=s' => \$resultsDir
+    );
+
+my $studyExtDbSpec = "Study_${name}|1";
+my $ontologyExtSpec = "OntologyTerm_${name}|1";
+my $schema = "ApidbUserDatasets";
+my $isaFormat = "simple";
+my $mappingFileBaseName = "ontologyMapping.xml";
+my $investigationFileBaseName = "investigation.xml";
+my $sampleDetailsFile = "$workDir/source.tsv";
+my $mbioFileExtensionsJson = '{ampliconTaxa => "abundance.tsv", wgsTaxa => "NA", level4ECs => "NA", pathwayAbundances => "NA", pathwayCoverages => "NA", eukdetectCpms => "NA", massSpec => "NA" }';
+
+my $collectionsYaml = "$ENV{PROJECT_HOME}/ApiCommonData/Load/ontology/General/collections/collections.yaml";
+
+my $dateObfuscationFile = "$workDir/dateObfuscation";
+open(DATE, ">$dateObfuscationFile") or die "Cannot open file $dateObfuscationFile for writing: $!";
+close DATE;
+
+print <<CONFIG
+params.studyDirectory = "$workDir"
+params.project = "NA"
+
+params.extDbRlsSpec = "$studyExtDbSpec"
+params.webDisplayOntologySpec = "$ontologyExtSpec"
+
+params.loadWebDisplayOntologyFile = true
+
+params.schema = "$schema"
+params.isaFormat = "$isaFormat"
+
+params.webDisplayOntologyFile = "$workDir/$name/$mappingFileBaseName"
+
+params.investigationBaseName = "$investigationFileBaseName"
+
+// optional files when isaFormat = simple
+params.optionalDateObfuscationFile = "$dateObfuscationFile"
+params.optionalValueMappingFile = "NA"
+params.investigationSubset = "$name"
+
+// optional ontology files
+params.optionalAnnotationPropertiesFile = "NA"
+
+params.optionalOntologyMappingOverrideFile = "$geoMappings"
+
+
+params.optionalMegaStudyYaml = "NA"
+params.megaStudyStableId = "NA"
+
+params.assayResultsDirectory = "$workDir"
+params.assayResultsFileExtensionsJson = "$mbioFileExtensionsJson";
+params.sampleDetailsFile = "$sampleDetailsFile"
+
+// optional ontology files
+params.optionalAnnotationPropertiesFile = "NA"
+
+// where to write download files.
+params.downloadFileBaseName = "NA"
+params.resultsDirectory = "${resultsDir}"
+
+// popbio species reconcilliation
+params.speciesReconciliationOntologySpec = "NA"
+params.speciesReconciliationFallbackSpecies = "NA"
+
+params.gusConfigFile = "$gusConfigFile"
+
+params.optionalGadmDataDirectory = "NA"
+params.optionalGadmSocketDirectory = "NA"
+params.optionalGadmPort = "NA"
+
+params.optionalCollectionsYaml = "NA"
+
+params.useOntologyTermTableForTaxonTerms = "NA"
+params.loadProtocolTypeAsVariable = false
+
+params.protocolVariableSourceId = "NA"
+params.noCommonDef = false
+
+trace.enabled = false
+trace.fields = 'task_id,hash,process,tag,status,exit,submit,realtime,%cpu,rss'
+
+
+CONFIG
