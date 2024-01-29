@@ -1,4 +1,6 @@
 #FROM veupathdb/vdi-plugin-base:3.0.0
+# TODO:  change this to use the appropriate tag of veupathdb/vdi-plugin-isasimple when it is available
+# FIXME:  jbrestel here is not functinal.
 FROM jbrestel/vdi-plugin-isasimple:latest
 
 RUN apt-get update && \
