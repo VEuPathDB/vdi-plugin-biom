@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-base:3.0.0
+FROM veupathdb/vdi-plugin-base:3.1.0
 
 RUN apt-get update \
     && apt-get install -y python3-biom-format python3-future \
