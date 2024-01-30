@@ -28,19 +28,19 @@ confReplace "${TEMPLATE_DB_NAME}" "$DB_NAME"
 echo "MAKING database ${DB_NAME}"
 createdb -T $TEMPLATE_DB_NAME -U postgres $DB_NAME
 
-# echo "Write Config ..."
-# writeNextflowConfig --workdir ${WORKING_DIR} \
-#   --gusConfigFile $GUS_CONFIG \
-#   --name $DB_NAME \
-#   --geoMappings $GEO_MAPPINGS \
-#   --resultsDir ${RESULTS_DIR} \
-#   >${WORKING_DIR}/nextflow.config
+echo "Write Config ..."
+writeNextflowConfig --workdir ${WORKING_DIR} \
+  --gusConfigFile $GUS_CONFIG \
+  --name $DB_NAME \
+  --geoMappings $GEO_MAPPINGS \
+  --resultsDir ${RESULTS_DIR} \
+  >${WORKING_DIR}/nextflow.config
 
-# echo "Begin Loading ..."
-# nextflow -C ${WORKING_DIR}/nextflow.config \
-#   run $PROJECT_HOME/eda-nextflow/main.nf \
-#   -ansi-log false \
-#   -entry loadUserDataset
+echo "Begin Loading ..."
+nextflow -C ${WORKING_DIR}/nextflow.config \
+  run $PROJECT_HOME/eda-nextflow/main.nf \
+  -ansi-log false \
+  -entry loadBiomUserDataset
 
-# echo "Dropping Database ${DB_NAME}"
-# dropdb -f -U postgres ${DB_NAME}
+echo "Dropping Database ${DB_NAME}"
+dropdb -f -U postgres ${DB_NAME}

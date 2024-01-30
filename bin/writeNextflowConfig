@@ -13,14 +13,16 @@ GetOptions('workDir=s' => \$workDir,
            'resultsDir=s' => \$resultsDir
     );
 
+my $isRelativeAbundance = "false";
+my $project = "MicrobiomeDB";
 my $studyExtDbSpec = "Study_${name}|1";
 my $ontologyExtSpec = "OntologyTerm_${name}|1";
 my $schema = "ApidbUserDatasets";
 my $isaFormat = "simple";
 my $mappingFileBaseName = "ontologyMapping.xml";
 my $investigationFileBaseName = "investigation.xml";
-my $sampleDetailsFile = "$workDir/source.tsv";
-my $mbioFileExtensionsJson = '{ampliconTaxa => "abundance.tsv", wgsTaxa => "NA", level4ECs => "NA", pathwayAbundances => "NA", pathwayCoverages => "NA", eukdetectCpms => "NA", massSpec => "NA" }';
+my $sampleDetailsFile = "$name/source.tsv";
+my $mbioFileExtensionsJson = sprintf("%s/ApiCommonData/Load/ontology/Microbiome/assayExtensions", $ENV{PROJECT_HOME} );
 
 my $collectionsYaml = "$ENV{PROJECT_HOME}/ApiCommonData/Load/ontology/General/collections/collections.yaml";
 
@@ -30,7 +32,10 @@ close DATE;
 
 print <<CONFIG
 params.studyDirectory = "$workDir"
-params.project = "NA"
+params.project = "$project"
+
+
+params.isRelativeAbundance = $isRelativeAbundance
 
 params.extDbRlsSpec = "$studyExtDbSpec"
 params.webDisplayOntologySpec = "$ontologyExtSpec"
@@ -42,7 +47,7 @@ params.isaFormat = "$isaFormat"
 
 params.webDisplayOntologyFile = "$workDir/$name/$mappingFileBaseName"
 
-params.investigationBaseName = "$investigationFileBaseName"
+params.investigationBaseName = "$name/$investigationFileBaseName"
 
 // optional files when isaFormat = simple
 params.optionalDateObfuscationFile = "$dateObfuscationFile"
@@ -58,8 +63,8 @@ params.optionalOntologyMappingOverrideFile = "$geoMappings"
 params.optionalMegaStudyYaml = "NA"
 params.megaStudyStableId = "NA"
 
-params.assayResultsDirectory = "$workDir"
-params.assayResultsFileExtensionsJson = "$mbioFileExtensionsJson";
+params.assayResultsDirectory = "$name"
+params.assayResultsFileExtensionsJson = '${mbioFileExtensionsJson}';
 params.sampleDetailsFile = "$sampleDetailsFile"
 
 // optional ontology files
