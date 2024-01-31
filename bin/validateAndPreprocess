@@ -27,16 +27,9 @@ def main():
     inputDir = sys.argv[1]
     outputDir = sys.argv[2]
     importer = BiomImporter()
-    importer.importBiom(inputDir, outputDir)
 
-    # run biomFilesToTsv just to validate.  (it will be run again during install-data)
-    # out = subprocess.run(["biomFilesToTsv", outputDir + "/data.tsv", outputDir + "/metadata.json", "tempdir"], text=True, capture_output=True)
-    # if (out.returncode == 1):  # validation error.  report to user
-    #     print(out.stdout, file=sys.stdout)
-    #     sys.exit(1)
-    # if (out.returncode != 0):
-    #     print("biomFilesToTsv failure: " + out.stderr, file=sys.stderr)
-    #     sys.exit(2)
+    # validate the biom file.  exits with status 1 if invalid (and 2 if system error)
+    importer.importBiom(inputDir, outputDir)
 
 if __name__ == "__main__":
     sys.exit(main())
