@@ -7,7 +7,9 @@ from BiomFileImporter import BiomImporter
 
 def usage():
     msg = """
-Validate and prepare a biom file to be imported
+Validate and prepare a biom file to be imported.  
+
+Generates metadata.json and data.tsv files, and writes them to output_dir
 
 Usage:  validateAndPreprocess input_dir output_dir
 
@@ -28,7 +30,7 @@ def main():
     outputDir = sys.argv[2]
     importer = BiomImporter()
 
-    # validate the biom file.  exits with status 1 if invalid (and 2 if system error)
+    # validate the biom file, and generate output files.  Exits with status 1 if invalid (and 2 if system error)
     importer.importBiom(inputDir, outputDir)
 
 if __name__ == "__main__":

@@ -19,8 +19,8 @@ GEO_MAPPINGS=/usr/local/lib/xml/geoMappings.xml
 
 echo "WORKING Directory = ${WORKING_DIR}"
 
-echo "validate biom file and make meta data and tsv file"
-validateUserFiles $INPUT_DIR $WORKING_DIR
+echo "validate biom file and make metadata.json and data.tsv files"
+validateAndPreprocess $INPUT_DIR $WORKING_DIR
 
 cp $GUS_HOME/config/gus.config $GUS_CONFIG
 confReplace "${TEMPLATE_DB_NAME}" "$DB_NAME"
