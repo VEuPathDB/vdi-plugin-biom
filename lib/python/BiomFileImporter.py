@@ -1,6 +1,4 @@
-import biom
 import os
-from biom.cli.table_validator import _validate_table
 from biom.parse import load_table
 from pathlib import Path
 import sys
@@ -45,12 +43,12 @@ class BiomImporter():
 # throw exit code 1 to provide user with validation error message (stdout)
 def validationError(msg):
     print(msg, file=sys.stdout)
-    sys.exit(1)
+    sys.exit(99)
 
-# throw exit code > 1 to indicat a systm error (stderr)
+# throw error exit code != 99 to indicate a system error (stderr)
 def systemError(msg):
     print(msg, file=sys.stderr)
-    sys.exit(2)
+    sys.exit(1)
 
 def give_table_extra_methods(table):
     # just my looking at the name you know this is gonna be good isn't it
