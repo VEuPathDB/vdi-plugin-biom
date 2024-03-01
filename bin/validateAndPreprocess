@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
-import subprocess
-sys.path.insert(0, "/opt/veupathdb/lib/python")
 from BiomFileImporter import BiomImporter
 
 def usage():
     msg = """
-Validate and prepare a biom file to be imported.  
+Validate and prepare a biom file to be imported.
 
 Generates metadata.json and data.tsv files, and writes them to output_dir
 
@@ -17,8 +15,8 @@ Where:
  - input_dir:  must contain exactly one biom format file
  - output_dir: where the processed files will be written
 
-exit 1 if the input is not valid
-exit 2 if there is a system err
+exit 99 if the input is not valid
+exit > 0 if there is a system err
 """
     print(msg, file=sys.stderr)
     sys.exit(2)
