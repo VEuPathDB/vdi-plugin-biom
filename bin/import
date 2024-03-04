@@ -68,5 +68,3 @@ nextflow -C ${WORKING_DIR}/nextflow.config \
   -ansi-log false \
   -entry loadBiomUserDataset \
   1>&2
-
-cleanup;
