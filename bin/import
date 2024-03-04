@@ -22,6 +22,9 @@ function catchExit() {
       ;;
     *)
       log "exiting due to unexpected error"
+      if [ -f ".nextflow.log" ]; then
+        cat ".nextflow.log" >&2
+      fi
       ;;
   esac
 

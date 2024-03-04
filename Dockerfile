@@ -16,5 +16,5 @@ RUN pip3 install h5py  --break-system-packages
 RUN pip3 install future --break-system-packages
 
 COPY [ "bin/updateHasCollections", "bin/validateAndPreprocess", "bin/writeNextflowConfig", "usr/bin/" ]
-COPY [ "bin/check-compatibility", "bin/import", "bin/install-data", "/opt/veupathdb/bin/" ]
+COPY [ "bin/check-compatibility", "bin/import", "/opt/veupathdb/bin/" ]
 COPY lib/ /opt/veupathdb/lib
