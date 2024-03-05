@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
-from BiomFileImporter import BiomImporter
+from BiomFilePreprocessor import BiomPreprocessor
 
 def usage():
     msg = """
@@ -26,10 +26,10 @@ def main():
         usage()
     inputDir = sys.argv[1]
     outputDir = sys.argv[2]
-    importer = BiomImporter()
+    preprocessor = BiomPreprocessor()
 
     # validate the biom file, and generate output files.  Exits with status 1 if invalid (and 2 if system error)
-    importer.importBiom(inputDir, outputDir)
+    preprocessor.preprocessBiom(inputDir, outputDir)
 
 if __name__ == "__main__":
     sys.exit(main())
