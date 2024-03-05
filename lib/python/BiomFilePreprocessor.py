@@ -3,9 +3,9 @@ from biom.parse import load_table
 from pathlib import Path
 import sys
 
-class BiomImporter():
+class BiomPreprocessor():
 
-    def importBiom(self, inputDir, outputDir):
+    def preprocessBiom(self, inputDir, outputDir):
         """
         inputDir must contain exactly one file, in biom format (BIOM 1.0 or BIOM 2.0+)
 
@@ -15,12 +15,16 @@ class BiomImporter():
         inputDirPath = Path(inputDir)
         files = list(inputDirPath.iterdir())
         if len(files) != 1:
-            validationError("Must provided exactly one input file")
+            validationError("Must provide exactly one input file")
 
         content_path = files[0]
 
         if not os.path.exists(content_path):
             systemError("File does not exist: " . content_path)
+
+        if os.path.getsize(content_path) > (1048576 * 1):
+            validationError("BIOM file is too large (" + str(os.path.getsize(content_path)) + " bytes). The maximum supported size is 10M.")
+                            
         try:
             table = load_table(content_path)
         except TypeError as e:
