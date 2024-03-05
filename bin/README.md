@@ -1,2 +1,2 @@
-NOTE: `install-meta`, `uninstall` `install-data` and `check-compatabiliyt` are pulled in from the ISASIMPLE plugin, via the Dockerfile
+NOTE: `install-meta`, `uninstall` `install-data` and `check-compatability` are pulled in from the ISASIMPLE plugin, via the Dockerfile
 

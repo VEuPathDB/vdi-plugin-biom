@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-isasimple:latest
+FROM veupathdb/vdi-plugin-isasimple:1.1.1
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip &&  \
@@ -16,5 +16,5 @@ RUN pip3 install h5py  --break-system-packages
 RUN pip3 install future --break-system-packages
 
 COPY [ "bin/updateHasCollections", "bin/validateAndPreprocess", "bin/writeNextflowConfig", "usr/bin/" ]
-COPY [ "bin/check-compatibility", "bin/import", "/opt/veupathdb/bin/" ]
+COPY [ "bin/import", "/opt/veupathdb/bin/" ]
 COPY lib/ /opt/veupathdb/lib
