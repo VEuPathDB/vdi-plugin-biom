@@ -1,13 +1,11 @@
-import biom
 import os
-from biom.cli.table_validator import _validate_table
 from biom.parse import load_table
 from pathlib import Path
 import sys
 
-class BiomImporter():
+class BiomPreprocessor():
 
-    def importBiom(self, inputDir, outputDir):
+    def preprocessBiom(self, inputDir, outputDir):
         """
         inputDir must contain exactly one file, in biom format (BIOM 1.0 or BIOM 2.0+)
 
@@ -17,12 +15,16 @@ class BiomImporter():
         inputDirPath = Path(inputDir)
         files = list(inputDirPath.iterdir())
         if len(files) != 1:
-            validationError("Must provided exactly one input file")
+            validationError("Must provide exactly one input file")
 
         content_path = files[0]
 
         if not os.path.exists(content_path):
             systemError("File does not exist: " . content_path)
+
+        if os.path.getsize(content_path) > (1048576 * 1):
+            validationError("BIOM file is too large (" + str(os.path.getsize(content_path)) + " bytes). The maximum supported size is 10M.")
+                            
         try:
             table = load_table(content_path)
         except TypeError as e:
@@ -45,12 +47,12 @@ class BiomImporter():
 # throw exit code 1 to provide user with validation error message (stdout)
 def validationError(msg):
     print(msg, file=sys.stdout)
-    sys.exit(1)
+    sys.exit(99)
 
-# throw exit code > 1 to indicat a systm error (stderr)
+# throw error exit code != 99 to indicate a system error (stderr)
 def systemError(msg):
     print(msg, file=sys.stderr)
-    sys.exit(2)
+    sys.exit(1)
 
 def give_table_extra_methods(table):
     # just my looking at the name you know this is gonna be good isn't it

@@ -1,1 +1,73 @@
+#!/usr/bin/bash
 
+set -e
+trap 'catchExit $?' EXIT
+
+function log() {
+  echo "$@" >&2
+}
+
+function cleanup() {
+  log "Dropping Database ${DB_NAME}"
+  dropdb -f -U postgres ${DB_NAME}
+}
+
+function catchExit() {
+  case "$1" in
+    "0")
+      # Success!
+      ;;
+    "99")
+      log "exiting due to import validation failure"
+      ;;
+    *)
+      log "exiting due to unexpected error"
+      if [ -f ".nextflow.log" ]; then
+        cat ".nextflow.log" >&2
+      fi
+      ;;
+  esac
+
+  cleanup
+}
+
+INPUT_DIR=$1
+RESULTS_DIR=$2
+
+WORKING_DIR=$PWD
+
+cp $INPUT_DIR/* $WORKING_DIR/
+
+function confReplace() {
+  sed -i "s#$1.*#$2#" $GUS_CONFIG
+}
+
+DB_NAME=`date +%Y%M%d%H%m%S`
+GUS_CONFIG=$WORKING_DIR/gus.config
+GEO_MAPPINGS=/usr/local/lib/xml/geoMappings.xml
+
+log "WORKING Directory = ${WORKING_DIR}"
+
+log "validate biom file and make metadata.json and data.tsv files"
+validateAndPreprocess $INPUT_DIR $WORKING_DIR
+
+cp $GUS_HOME/config/gus.config $GUS_CONFIG
+confReplace "${TEMPLATE_DB_NAME}" "$DB_NAME"
+
+log "MAKING database ${DB_NAME}"
+createdb -T $TEMPLATE_DB_NAME -U postgres $DB_NAME
+
+log "Write Config ..."
+writeNextflowConfig --workdir ${WORKING_DIR} \
+  --gusConfigFile $GUS_CONFIG \
+  --name $DB_NAME \
+  --geoMappings $GEO_MAPPINGS \
+  --resultsDir ${RESULTS_DIR} \
+  >${WORKING_DIR}/nextflow.config
+
+log "Begin Loading ..."
+nextflow -C ${WORKING_DIR}/nextflow.config \
+  run $PROJECT_HOME/eda-nextflow/main.nf \
+  -ansi-log false \
+  -entry loadBiomUserDataset \
+  1>&2
