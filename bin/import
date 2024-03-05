@@ -9,7 +9,7 @@ function log() {
 
 function cleanup() {
   log "Dropping Database ${DB_NAME}"
-  dropdb -f -U postgres ${DB_NAME}
+  psql -U postgres -c "DROP DATABASE IF EXISTS \"${DB_NAME}\" WITH (FORCE);" > /dev/null
 }
 
 function catchExit() {
