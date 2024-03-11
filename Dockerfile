@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-isasimple:1.1.4
+FROM veupathdb/vdi-plugin-isasimple:1.2.0
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip &&  \
@@ -15,6 +15,5 @@ RUN pip3 install biom-format  --break-system-packages
 RUN pip3 install h5py  --break-system-packages
 RUN pip3 install future --break-system-packages
 
-COPY [ "bin/updateHasCollections", "bin/validateAndPreprocess", "bin/writeNextflowConfig", "usr/bin/" ]
-COPY [ "bin/import", "/opt/veupathdb/bin/" ]
-COPY lib/ /opt/veupathdb/lib
+COPY bin /opt/veupathdb/bin
+COPY lib /opt/veupathdb/lib

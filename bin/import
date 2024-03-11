@@ -13,22 +13,9 @@ function cleanup() {
 }
 
 function catchExit() {
-  case "$1" in
-    "0")
-      # Success!
-      ;;
-    "99")
-      log "exiting due to import validation failure"
-      ;;
-    *)
-      log "exiting due to unexpected error"
-      if [ -f ".nextflow.log" ]; then
-        cat ".nextflow.log" >&2
-      fi
-      ;;
-  esac
-
   cleanup
+  process-nf-result
+  exit $?
 }
 
 INPUT_DIR=$1
