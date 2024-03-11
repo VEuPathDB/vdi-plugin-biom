@@ -1,7 +1,10 @@
 import os
+import json
+import numpy
+import sys
+
 from biom.parse import load_table
 from pathlib import Path
-import sys
 
 class BiomPreprocessor():
 
@@ -24,7 +27,7 @@ class BiomPreprocessor():
 
         if os.path.getsize(content_path) > (1048576 * 1):
             validationError("BIOM file is too large (" + str(os.path.getsize(content_path)) + " bytes). The maximum supported size is 10M.")
-                            
+
         try:
             table = load_table(content_path)
         except TypeError as e:
@@ -90,7 +93,6 @@ def give_table_extra_methods(table):
         return "http://biom-format.org"
 
     from datetime import datetime
-    from json import dumps
 
     def to_json_but_only_metadata(self, generated_by, direct_io=None):
         """Returns a JSON string representing the table in BIOM format.
@@ -192,9 +194,9 @@ def give_table_extra_methods(table):
         for obs_index, obs in enumerate(self.iter(axis='observation')):
             # i'm crying on the inside
             if obs_index != max_row_idx:
-                rows.append(u'{"id": %s, "metadata": %s},' % (dumps(obs[1]), dumps(obs[2])))
+                rows.append(u'{"id": %s, "metadata": %s},' % (json_encode(obs[1]), json_encode(obs[2])))
             else:
-                rows.append(u'{"id": %s, "metadata": %s}],' % (dumps(obs[1]), dumps(obs[2])))
+                rows.append(u'{"id": %s, "metadata": %s}],' % (json_encode(obs[1]), json_encode(obs[2])))
 
             # turns out its a pain to figure out when to place commas. the
             # simple work around, at the expense of a little memory
@@ -210,10 +212,10 @@ def give_table_extra_methods(table):
         for samp_index, samp in enumerate(self.iter()):
             if samp_index != max_col_idx:
                 columns.append(u'{"id": %s, "metadata": %s},' % (
-                    dumps(samp[1]), dumps(samp[2])))
+                    json_encode(samp[1]), json_encode(samp[2])))
             else:
                 columns.append(u'{"id": %s, "metadata": %s}]' % (
-                    dumps(samp[1]), dumps(samp[2])))
+                    json_encode(samp[1]), json_encode(samp[2])))
 
         if rows[0] == u'"rows": [' and len(rows) == 1:
             # empty table case
@@ -253,21 +255,6 @@ def give_table_extra_methods(table):
             A JSON-formatted string representing the biom table
         """
         for obs_index, obs in enumerate(self.iter(axis='observation')):
-            """
-            # i'm crying on the inside
-            if obs_index != max_row_idx:
-                rows.append(u'{"id": %s, "metadata": %s},' % (dumps(obs[1]),
-                                                              dumps(obs[2])))
-            else:
-                rows.append(u'{"id": %s, "metadata": %s}],' % (dumps(obs[1]),
-                                                               dumps(obs[2])))
-
-            # turns out its a pain to figure out when to place commas. the
-            # simple work around, at the expense of a little memory
-            # (bound by the number of samples) is to build of what will be
-            # written, and then add in the commas where necessary.
-            built_row = []
-            """
             for col_index, val in enumerate(obs[0]):
                 if float(val) != 0.0:
                     if direct_io:
@@ -284,3 +271,20 @@ def give_table_extra_methods(table):
     #
     table.to_json_but_only_metadata = to_json_but_only_metadata.__get__(table)
     table.to_json_but_only_data_and_not_json_but_tsv = to_json_but_only_data_and_not_json_but_tsv.__get__(table)
+
+
+def json_encode(value):
+    return json.dumps(value, cls=NumpySafeJsonEncoder)
+
+
+class NumpySafeJsonEncoder(json.JSONEncoder):
+    def default(self, value):
+        if isinstance(value, numpy.integer):
+            return int(value)
+        if isinstance(value, numpy.floating):
+            return float(value)
+        if isinstance(value, numpy.bool_):
+            return bool(value)
+        if isinstance(value, numpy.ndarray):
+            return value.tolist()
+        return super(NumpySafeJsonEncoder, self).default(value)
