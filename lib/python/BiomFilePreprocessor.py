@@ -5,6 +5,8 @@ import sys
 
 from biom.parse import load_table
 from pathlib import Path
+import shutil
+
 
 class BiomPreprocessor():
 
@@ -17,10 +19,20 @@ class BiomPreprocessor():
 
         inputDirPath = Path(inputDir)
         files = list(inputDirPath.iterdir())
-        if len(files) != 1:
-            validationError("Must provide exactly one input file")
 
-        content_path = files[0]
+        tsvFiles = [file for file in files if file.suffix == '.tsv']
+        jsonFiles = [file for file in files if file.suffix == '.json']
+
+        if len(tsvFiles) == 1 and len(jsonFiles) == 1:
+            shutil.copyfile(tsvFiles[0], outputDir + "/data.tsv")
+            shutil.copyfile(jsonFiles[0], outputDir + "/metadata.json")
+            sys.exit(0)
+
+        biomFiles = [file for file in files if file.suffix == '.biom']
+        if len(biomFiles) != 1:
+            validationError("Must provided exactly one input file")
+
+        content_path = biomFiles[0]
 
         if not os.path.exists(content_path):
             systemError("File does not exist: " . content_path)
@@ -145,6 +157,10 @@ def give_table_extra_methods(table):
         test_element = 0
         if has_data:
             test_element = self[0, 0]
+
+        if not has_data:
+            validationError("The biom file did not contain a data matrix")
+
 
         # Determine the type of elements the matrix is storing.
         if isinstance(test_element, int):
