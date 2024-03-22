@@ -2,11 +2,15 @@ import os
 import json
 import numpy
 import sys
+import shutil
 
 from biom.parse import load_table
 from pathlib import Path
 
 class BiomPreprocessor():
+
+    METADATA_FILE_NAME = "metadata.json"
+    DATA_FILE_NAME = "data.tsv"
 
     def preprocessBiom(self, inputDir, outputDir):
         """
@@ -15,21 +19,26 @@ class BiomPreprocessor():
         the biom validator is too strict - gives errors like "Invalid format 'Biological Observation Matrix 0.9.1-dev', must be '1.0.0'"
         """
 
-        inputDirPath = Path(inputDir)
-        files = list(inputDirPath.iterdir())
-        if len(files) != 1:
-            validationError("Must provide exactly one input file")
+        files = self.read_and_validate_input_dir(inputDir)
 
-        content_path = files[0]
 
-        if not os.path.exists(content_path):
-            systemError("File does not exist: " . content_path)
+        if len(files) == 1:
+            self.process_biom_file(files[0], outputDir)
+        else:
+            self.copy_udis_files(inputDir, outputDir)
 
-        if os.path.getsize(content_path) > (1048576 * 1):
-            validationError("BIOM file is too large (" + str(os.path.getsize(content_path)) + " bytes). The maximum supported size is 10M.")
+
+    def copy_udis_files(self, input_dir: str, output_dir: str) -> None:
+        shutil.copy(os.path.join(input_dir, self.METADATA_FILE_NAME), os.path.join(output_dir, self.METADATA_FILE_NAME))
+        shutil.copy(os.path.join(input_dir, self.DATA_FILE_NAME), os.path.join(output_dir, self.DATA_FILE_NAME))
+
+
+    def process_biom_file(self, biom_file: str, output_dir: str) -> None:
+        if os.path.getsize(biom_file) > (1048576 * 1):
+            validationError("BIOM file is too large (" + str(os.path.getsize(biom_file)) + " bytes). The maximum supported size is 10M.")
 
         try:
-            table = load_table(content_path)
+            table = load_table(biom_file)
         except TypeError as e:
             validationError(e)
         except ValueError as e:
@@ -41,11 +50,32 @@ class BiomPreprocessor():
         give_table_extra_methods(table)
         generated_by = "MicrobiomeDb exporter"
 
-        with open(outputDir + "/metadata.json", 'w') as f1:
+        with open(os.path.join(output_dir, self.METADATA_FILE_NAME), 'w') as f1:
             table.to_json_but_only_metadata(generated_by, direct_io=f1)
 
-        with open(outputDir + "/data.tsv", 'w') as f2:
+        with open(os.path.join(output_dir, self.DATA_FILE_NAME), 'w') as f2:
             table.to_json_but_only_data_and_not_json_but_tsv(generated_by, direct_io=f2)
+
+
+    def read_and_validate_input_dir(self, dir: str) -> list[str]:
+        dir_path = Path(dir)
+        files = [path.name for path in dir_path.iterdir()]
+
+        if len(files) == 1:
+            return files
+
+        # For compatibility with legacy UDIS datasets during the dataset migration
+        # we also accept input directories that contain specifically this structure:
+        #
+        # /:
+        #   data.tsv
+        #   metadata.json
+        #   uploaded.biom
+        if len(files) == 3 and "data.tsv" in files and "metadata.json" in files and "uploaded.biom" in files:
+            return files
+
+        validationError("invalid input directory contents: " + str(files))
+
 
 # throw exit code 1 to provide user with validation error message (stdout)
 def validationError(msg):
