@@ -34,7 +34,7 @@ function confReplace() {
   sed -i "s#$1.*#$2#" $GUS_CONFIG
 }
 
-DB_NAME=`date +%Y%M%d%H%m%S`
+DB_NAME=`date +%Y%m%d%H%M%S`
 GUS_CONFIG=$WORKING_DIR/gus.config
 GEO_MAPPINGS=/usr/local/lib/xml/geoMappings.xml
 
