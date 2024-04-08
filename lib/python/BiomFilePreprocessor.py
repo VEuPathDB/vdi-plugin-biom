@@ -34,9 +34,6 @@ class BiomPreprocessor():
 
 
     def process_biom_file(self, biom_file: str, output_dir: str) -> None:
-        if os.path.getsize(biom_file) > (1048576 * 1):
-            validationError("BIOM file is too large (" + str(os.path.getsize(biom_file)) + " bytes). The maximum supported size is 10M.")
-
         try:
             table = load_table(biom_file)
         except TypeError as e:
