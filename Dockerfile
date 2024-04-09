@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-isasimple:1.2.10
+FROM veupathdb/vdi-plugin-isasimple:1.2.11
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip &&  \
