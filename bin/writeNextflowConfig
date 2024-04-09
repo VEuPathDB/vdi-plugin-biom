@@ -84,7 +84,7 @@ params.optionalGadmDataDirectory = "NA"
 params.optionalGadmSocketDirectory = "NA"
 params.optionalGadmPort = "NA"
 
-params.optionalCollectionsYaml = "NA"
+params.optionalCollectionsYaml = "$collectionsYaml"
 
 params.useOntologyTermTableForTaxonTerms = "NA"
 params.loadProtocolTypeAsVariable = false

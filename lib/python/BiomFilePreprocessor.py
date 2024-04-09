@@ -173,6 +173,9 @@ def give_table_extra_methods(table):
         if has_data:
             test_element = self[0, 0]
 
+        if not has_data:
+            validationError("The biom file does not contain a data matrix")
+            
         # Determine the type of elements the matrix is storing.
         if isinstance(test_element, int):
             matrix_element_type = u"int"
