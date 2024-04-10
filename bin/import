@@ -40,6 +40,9 @@ GEO_MAPPINGS=/usr/local/lib/xml/geoMappings.xml
 
 log "WORKING Directory = ${WORKING_DIR}"
 
+# for mbio, we call the main entity "Source"
+sed 's/entity/Source/i' /usr/local/lib/xml/geoMappings.xml >${WORKING_DIR}/geoMappingsMbio.xml
+
 log "validate biom file and make metadata.json and data.tsv files"
 validateAndPreprocess $INPUT_DIR $WORKING_DIR
 
@@ -53,7 +56,7 @@ log "Write Config ..."
 writeNextflowConfig --workdir ${WORKING_DIR} \
   --gusConfigFile $GUS_CONFIG \
   --name $DB_NAME \
-  --geoMappings $GEO_MAPPINGS \
+  --geoMappings ${WORKING_DIR}/geoMappingsMbio.xml \
   --resultsDir ${RESULTS_DIR} \
   >${WORKING_DIR}/nextflow.config
 
