@@ -7,9 +7,17 @@ import shutil
 from biom.parse import load_table
 from pathlib import Path
 
+SIZE_KIB=1024
+SIZE_MIB=SIZE_KIB*1024
+
 class BiomPreprocessor():
 
+    MAX_BIOM_FILE_SIZE_MIB = 100
+
+    MAX_BIOM_FILE_SIZE_BYTES = MAX_BIOM_FILE_SIZE_MIB * SIZE_MIB
+
     METADATA_FILE_NAME = "metadata.json"
+
     DATA_FILE_NAME = "data.tsv"
 
     def preprocessBiom(self, inputDir, outputDir):
@@ -34,6 +42,11 @@ class BiomPreprocessor():
 
 
     def process_biom_file(self, biom_file: str, output_dir: str) -> None:
+        stats = os.stat(biom_file)
+
+        if stats.st_size > self.MAX_BIOM_FILE_SIZE_BYTES:
+            validationError(f"Input BIOM file size exceeded max file size limit of {self.MAX_BIOM_FILE_SIZE_MIB}M")
+
         try:
             table = load_table(biom_file)
         except TypeError as e:
@@ -175,7 +188,7 @@ def give_table_extra_methods(table):
 
         if not has_data:
             validationError("The biom file does not contain a data matrix")
-            
+
         # Determine the type of elements the matrix is storing.
         if isinstance(test_element, int):
             matrix_element_type = u"int"
