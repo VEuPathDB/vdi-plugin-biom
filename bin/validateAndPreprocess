@@ -26,12 +26,9 @@ def main():
         usage()
     inputDir = sys.argv[1]
     outputDir = sys.argv[2]
-    preprocessor = BiomPreprocessor()
 
     # validate the biom file, and generate output files.  Exits with status 1 if invalid (and 2 if system error)
-    preprocessor.preprocessBiom(inputDir, outputDir)
+    BiomPreprocessor.preprocess_biom(inputDir, outputDir)
 
 if __name__ == "__main__":
     sys.exit(main())
-
-

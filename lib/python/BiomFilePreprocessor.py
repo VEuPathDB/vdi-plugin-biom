@@ -10,43 +10,59 @@ from pathlib import Path
 SIZE_KIB=1024
 SIZE_MIB=SIZE_KIB*1024
 
-class BiomPreprocessor():
+MAX_BIOM_FILE_SIZE_MIB = 100
+MAX_BIOM_FILE_SIZE_BYTES = MAX_BIOM_FILE_SIZE_MIB * SIZE_MIB
 
-    MAX_BIOM_FILE_SIZE_MIB = 100
+# UDIS Compatibility
+METADATA_FILE_NAME = "metadata.json"
+DATA_FILE_NAME = "data.tsv"
 
-    MAX_BIOM_FILE_SIZE_BYTES = MAX_BIOM_FILE_SIZE_MIB * SIZE_MIB
+class UDISCompatibilityFileRefs:
+    def __init__(
+            self,
+            biom_file: str | None = None,
+            data_file: str | None = None,
+            meta_file: str | None = None,
+    ) -> None:
+        self.biom_file = biom_file
+        self.data_file = data_file
+        self.meta_file = meta_file
 
-    METADATA_FILE_NAME = "metadata.json"
+    def is_udis_dataset(self) -> bool:
+        return self.data_file is not None and self.meta_file is not None
 
-    DATA_FILE_NAME = "data.tsv"
 
-    def preprocessBiom(self, inputDir, outputDir):
+class BiomPreprocessor(object):
+    @classmethod
+    def preprocess_biom(cls, inputDir: str, outputDir: str) -> None:
         """
-        inputDir must contain exactly one file, in biom format (BIOM 1.0 or BIOM 2.0+)
+        inputDir must contain exactly one file, in biom format (BIOM 1.0 or
+        BIOM 2.0+)
 
-        the biom validator is too strict - gives errors like "Invalid format 'Biological Observation Matrix 0.9.1-dev', must be '1.0.0'"
+        the biom validator is too strict - gives errors like "Invalid format
+        'Biological Observation Matrix 0.9.1-dev', must be '1.0.0'"
         """
 
+        self = cls()
         files = self.read_and_validate_input_dir(inputDir)
 
+        stats = os.stat(files.biom_file)
 
-        if len(files) == 1:
-            self.process_biom_file(files[0], outputDir)
+        if stats.st_size > MAX_BIOM_FILE_SIZE_BYTES:
+            validationError(f"Input BIOM file size exceeded max file size limit of {MAX_BIOM_FILE_SIZE_MIB}M")
+
+        if files.is_udis_dataset():
+            self.process_biom_file(files.biom_file, outputDir)
         else:
             self.copy_udis_files(inputDir, outputDir)
 
 
     def copy_udis_files(self, input_dir: str, output_dir: str) -> None:
-        shutil.copy(os.path.join(input_dir, self.METADATA_FILE_NAME), os.path.join(output_dir, self.METADATA_FILE_NAME))
-        shutil.copy(os.path.join(input_dir, self.DATA_FILE_NAME), os.path.join(output_dir, self.DATA_FILE_NAME))
+        shutil.copy(os.path.join(input_dir, METADATA_FILE_NAME), os.path.join(output_dir, METADATA_FILE_NAME))
+        shutil.copy(os.path.join(input_dir, DATA_FILE_NAME), os.path.join(output_dir, DATA_FILE_NAME))
 
 
     def process_biom_file(self, biom_file: str, output_dir: str) -> None:
-        stats = os.stat(biom_file)
-
-        if stats.st_size > self.MAX_BIOM_FILE_SIZE_BYTES:
-            validationError(f"Input BIOM file size exceeded max file size limit of {self.MAX_BIOM_FILE_SIZE_MIB}M")
-
         try:
             table = load_table(biom_file)
         except TypeError as e:
@@ -60,19 +76,19 @@ class BiomPreprocessor():
         give_table_extra_methods(table)
         generated_by = "MicrobiomeDb exporter"
 
-        with open(os.path.join(output_dir, self.METADATA_FILE_NAME), 'w') as f1:
+        with open(os.path.join(output_dir, METADATA_FILE_NAME), 'w') as f1:
             table.to_json_but_only_metadata(generated_by, direct_io=f1)
 
-        with open(os.path.join(output_dir, self.DATA_FILE_NAME), 'w') as f2:
+        with open(os.path.join(output_dir, DATA_FILE_NAME), 'w') as f2:
             table.to_json_but_only_data_and_not_json_but_tsv(generated_by, direct_io=f2)
 
 
-    def read_and_validate_input_dir(self, dir: str) -> list[str]:
+    def read_and_validate_input_dir(self, dir: str) -> UDISCompatibilityFileRefs:
         dir_path = Path(dir)
         files = [path.name for path in dir_path.iterdir()]
 
         if len(files) == 1:
-            return files
+            return UDISCompatibilityFileRefs(biom_file=files[0])
 
         # For compatibility with legacy UDIS datasets during the dataset migration
         # we also accept input directories that contain specifically this structure:
@@ -82,7 +98,7 @@ class BiomPreprocessor():
         #   metadata.json
         #   uploaded.biom
         if len(files) == 3 and "data.tsv" in files and "metadata.json" in files and "uploaded.biom" in files:
-            return files
+            return UDISCompatibilityFileRefs(biom_file="uploaded.biom", data_file="data.tsv", meta_file="metadata.json")
 
         validationError("invalid input directory contents: " + str(files))
 

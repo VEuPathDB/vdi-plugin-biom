@@ -36,3 +36,10 @@ shell:
 
 logs:
 	@docker logs -f $(IMAGE_NAME)-plugin-1
+
+.PHONY: venv
+venv:
+	@python3 -m venv .venv
+	@. .venv/bin/activate; pip install -r pip-requirements.txt
+	@echo
+	@echo "run '. .venv/bin/activate' to enable the virtual environment"
