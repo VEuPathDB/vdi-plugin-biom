@@ -52,9 +52,9 @@ class BiomPreprocessor(object):
             validationError(f"Input BIOM file size exceeded max file size limit of {MAX_BIOM_FILE_SIZE_MIB}M")
 
         if files.is_udis_dataset():
-            self.process_biom_file(files.biom_file, outputDir)
-        else:
             self.copy_udis_files(inputDir, outputDir)
+        else:
+            self.process_biom_file(files.biom_file, outputDir)
 
 
     def copy_udis_files(self, input_dir: str, output_dir: str) -> None:
