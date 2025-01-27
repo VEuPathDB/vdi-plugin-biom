@@ -1,4 +1,4 @@
-FROM veupathdb/vdi-plugin-isasimple:1.4.1
+FROM veupathdb/vdi-plugin-isasimple:1.4.2
 
 ENV PYTHONPATH "${PYTHONPATH}:/opt/veupathdb/lib/python"
 
