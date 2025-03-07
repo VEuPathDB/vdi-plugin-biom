@@ -28,6 +28,7 @@ RESULTS_DIR=$2
 
 WORKING_DIR=$PWD
 
+rm -f $INPUT_DIR/vdi-meta.json
 cp $INPUT_DIR/* $WORKING_DIR/
 
 function confReplace() {
