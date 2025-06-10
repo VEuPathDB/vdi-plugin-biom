@@ -11,3 +11,5 @@ RUN apt-get update \
 
 COPY bin /opt/veupathdb/bin
 COPY lib /opt/veupathdb/lib
+
+CMD PLUGIN_ID=biom run-plugin.sh
