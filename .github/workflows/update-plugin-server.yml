@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Update Version
-        run: sed -i "s/ARG PLUGIN_SERVER_VERSION.+/ARG PLUGIN_SERVER_VERSION=${{ inputs.tag }}/"
+        run: sed -i "s/ARG PLUGIN_SERVER_VERSION.+/ARG PLUGIN_SERVER_VERSION=${{ inputs.tag }}/" Dockerfile
       - name: Create PR
         uses: peter-evans/create-pull-request@v7
         with:
