@@ -29,4 +29,5 @@ jobs:
           sign-commits: true
           body: Update plugin server to version ${{ inputs.tag }}
           title: Plugin Server ${{ inputs.tag }}
-          token:  ${{ secrets.VDI_BUILD_TREE_TOKEN }}
+          token: ${{ secrets.VDI_BUILD_TREE_TOKEN }}
+          author: 'VDI[bot] <41898282+github-actions[bot]@users.noreply.github.com>'
