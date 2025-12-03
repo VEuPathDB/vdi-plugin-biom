@@ -30,9 +30,9 @@ RUN wget -q -O fbw.zip https://github.com/VEuPathDB/script-find-bin-width/releas
     && rm fbw.zip \
     && mv find-bin-width /usr/bin/find-bin-width
 
-ARG SHARED_LIB_GIT_COMMIT_SHA=ee4853748fcdd5d7d8675eb0eb3828ea11da8f42
-RUN git clone https://github.com/VEuPathDB/vdi-lib-plugin-study.git \
-    && cd vdi-lib-plugin-study \
+ARG SHARED_LIB_GIT_COMMIT_SHA=bf9773e864eb09b1013c4fbc9e0f6f73d8fa2f77
+RUN git clone https://github.com/VEuPathDB/vdi-lib-plugin-eda.git \
+    && cd vdi-lib-plugin-eda \
     && git checkout ${SHARED_LIB_GIT_COMMIT_SHA} \
     && mkdir -p /opt/veupathdb/lib/perl /opt/veupathdb/bin \
     && cp lib/perl/VdiStudyHandlerCommon.pm /opt/veupathdb/lib/perl \
