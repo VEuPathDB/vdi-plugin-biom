@@ -1,4 +1,4 @@
-FROM veupathdb/gus-apidb-base:1.2.11
+FROM veupathdb/gus-apidb-base:1.2.12
 
 ENV LANG=en_US.UTF-8 \
     JVM_MEM_ARGS="-Xms16m -Xmx64m" \
