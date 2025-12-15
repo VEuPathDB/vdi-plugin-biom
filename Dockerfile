@@ -43,6 +43,7 @@ ARG APICOMMONDATA_COMMIT_HASH=9270a2c542f374b33deedaa60e4898e9e7479cc7 \
     EDA_NEXTFLOW_GIT_COMMIT_SHA=f113cca94b9d16695dc4ac721de211d72e7c396f
 
 # CLONE ADDITIONAL GIT REPOS
+COPY xml/geoMappings.xml /usr/local/lib/xml/geoMappings.xml
 COPY bin/buildGus.bash /usr/bin/buildGus.bash
 RUN /usr/bin/buildGus.bash
 
