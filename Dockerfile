@@ -38,7 +38,7 @@ RUN git clone https://github.com/VEuPathDB/vdi-lib-plugin-eda.git \
     && cp lib/perl/VdiStudyHandlerCommon.pm /opt/veupathdb/lib/perl \
     && cp bin/* /opt/veupathdb/bin
 
-ARG APICOMMONDATA_COMMIT_HASH=9270a2c542f374b33deedaa60e4898e9e7479cc7 \
+ARG APICOMMONDATA_COMMIT_HASH=bd11ef1a272e149a2c692cd66d67e4caa813c7d6 \
     CLINEPIDATA_GIT_COMMIT_SHA=8d31ba1b5cf7f6b022058b7c89e8e3ab0665f543 \
     EDA_NEXTFLOW_GIT_COMMIT_SHA=f113cca94b9d16695dc4ac721de211d72e7c396f
 
