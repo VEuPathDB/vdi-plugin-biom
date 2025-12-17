@@ -30,7 +30,7 @@ RUN wget -q -O fbw.zip https://github.com/VEuPathDB/script-find-bin-width/releas
     && rm fbw.zip \
     && mv find-bin-width /usr/bin/find-bin-width
 
-ARG SHARED_LIB_GIT_COMMIT_SHA=bf9773e864eb09b1013c4fbc9e0f6f73d8fa2f77
+ARG SHARED_LIB_GIT_COMMIT_SHA=94274cbe2bee64e8e038e46f92b7a803fb48287a
 RUN git clone https://github.com/VEuPathDB/vdi-lib-plugin-eda.git \
     && cd vdi-lib-plugin-eda \
     && git checkout ${SHARED_LIB_GIT_COMMIT_SHA} \
