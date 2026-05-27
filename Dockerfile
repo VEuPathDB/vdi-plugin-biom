@@ -48,7 +48,7 @@ COPY bin/buildGus.bash /usr/bin/buildGus.bash
 RUN /usr/bin/buildGus.bash
 
 # VDI PLUGIN SERVER
-ARG PLUGIN_SERVER_VERSION=v1.8.0
+ARG PLUGIN_SERVER_VERSION=v1.8.2-rc1
 RUN curl "https://github.com/VEuPathDB/vdi-service/releases/download/${PLUGIN_SERVER_VERSION}/plugin-server.tar.gz" -Lf --no-progress-meter | tar -xz
 
 ENV PYTHONPATH "${PYTHONPATH}:/opt/veupathdb/lib/python"
